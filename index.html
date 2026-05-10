@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>13 Questions for Deep Paper Reading</title>
+  <style>
+    :root {
+      --ink: #1d1d1f;
+      --muted: #6e6e73;
+      --line: #d2d2d7;
+      --panel: rgba(255, 255, 255, 0.86);
+      --surface: #f5f5f7;
+      --accent: #0071e3;
+      --accent-dark: #005bb5;
+      --cyan: #5ac8fa;
+      --green: #34c759;
+      --blue: #0071e3;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--surface);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0 14px;
+      color: var(--ink);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--accent);
+      font-weight: 900;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(52, 199, 89, 0.14);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 336px;
+      padding: 68px 0 70px;
+      color: var(--ink);
+      background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+    }
+
+    .hero::before {
+      display: none;
+    }
+
+    .hero::after {
+      display: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      width: min(760px, 100%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 840px;
+      font-size: clamp(40px, 5.3vw, 68px);
+      line-height: 1.03;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+
+    .title-line {
+      display: block;
+    }
+
+    .title-line.accent {
+      color: var(--accent);
+      font-size: 1.08em;
+    }
+
+    .hero p {
+      max-width: 670px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 18px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      color: #ffffff;
+      background: var(--accent);
+      box-shadow: 0 14px 34px rgba(0, 113, 227, 0.24);
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      border-color: rgba(0, 0, 0, 0.12);
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .button.demo {
+      color: var(--accent);
+      border-color: rgba(0, 113, 227, 0.2);
+      background: rgba(0, 113, 227, 0.08);
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: -42px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .metric {
+      padding: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(18px);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    main {
+      padding: 38px 0 68px;
+    }
+
+    .example-wrap {
+      margin-top: 28px;
+    }
+
+    .paper-card {
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .paper-top {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 18px;
+      padding: 24px;
+      color: var(--ink);
+      background: linear-gradient(180deg, #ffffff, #f5f7fb);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .paper-number {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border-radius: 8px;
+      color: #ffffff;
+      background: var(--accent);
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(0, 113, 227, 0.24);
+    }
+
+    .paper-top h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .paper-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .paper-meta span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .paper-body {
+      padding: 24px;
+    }
+
+    .paper-body .row-text {
+      color: #334155;
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .paper-body .row-label {
+      font-size: 15px;
+    }
+
+    .core-takeaway {
+      margin: 0 0 18px;
+      padding: 16px;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      background: #f5f9ff;
+      color: #334155;
+      font-weight: 650;
+    }
+
+    .source-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #e6ebf2;
+    }
+
+    .source-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 11px;
+      border: 1px solid #d9e0ea;
+      border-radius: 999px;
+      color: #1e293b;
+      background: #f8fafc;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .source-links a:hover {
+      border-color: rgba(0, 113, 227, 0.28);
+      background: #f5f9ff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .rail {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(18px);
+    }
+
+    .rail h2,
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-list a {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 11px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 8px;
+      color: #424245;
+      background: rgba(255, 255, 255, 0.72);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .nav-list a:hover {
+      border-color: rgba(0, 113, 227, 0.24);
+      background: #f5f9ff;
+    }
+
+    .nav-list b {
+      color: var(--accent-dark);
+    }
+
+    .panel {
+      margin-bottom: 22px;
+      padding: 24px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(18px);
+    }
+
+    .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .section-kicker::before {
+      content: "";
+      width: 18px;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li,
+    .summary-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.07);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .steps li:hover,
+    .summary-row:hover {
+      border-color: rgba(0, 113, 227, 0.24);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07);
+      transform: translateY(-1px);
+    }
+
+    .badge,
+    .row-index {
+      display: grid;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 7px;
+      color: #ffffff;
+      background: var(--accent);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .row-body {
+      min-width: 0;
+    }
+
+    .row-label {
+      margin-bottom: 3px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .row-text {
+      color: #485469;
+      font-size: 14px;
+    }
+
+    #format .summary-row {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(0, 0, 0, 0.06);
+      background: linear-gradient(90deg, var(--rainbow-bg), rgba(255, 255, 255, 0.78) 42%);
+    }
+
+    #format .summary-row::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--rainbow);
+    }
+
+    #format .summary-row .row-index {
+      background: var(--rainbow);
+      box-shadow: 0 10px 22px var(--rainbow-glow);
+    }
+
+    #format .summary-row .row-label {
+      color: var(--rainbow-text);
+    }
+
+    #format .summary-row:nth-child(1) {
+      --rainbow: #ff3b30;
+      --rainbow-text: #b42318;
+      --rainbow-bg: rgba(255, 59, 48, 0.08);
+      --rainbow-glow: rgba(255, 59, 48, 0.22);
+    }
+
+    #format .summary-row:nth-child(2) {
+      --rainbow: #ff7a00;
+      --rainbow-text: #b45309;
+      --rainbow-bg: rgba(255, 122, 0, 0.09);
+      --rainbow-glow: rgba(255, 122, 0, 0.22);
+    }
+
+    #format .summary-row:nth-child(3) {
+      --rainbow: #ffcc00;
+      --rainbow-text: #8a5a00;
+      --rainbow-bg: rgba(255, 204, 0, 0.11);
+      --rainbow-glow: rgba(255, 204, 0, 0.22);
+    }
+
+    #format .summary-row:nth-child(4) {
+      --rainbow: #a3e635;
+      --rainbow-text: #4d7c0f;
+      --rainbow-bg: rgba(163, 230, 53, 0.12);
+      --rainbow-glow: rgba(163, 230, 53, 0.22);
+    }
+
+    #format .summary-row:nth-child(5) {
+      --rainbow: #34c759;
+      --rainbow-text: #15803d;
+      --rainbow-bg: rgba(52, 199, 89, 0.1);
+      --rainbow-glow: rgba(52, 199, 89, 0.22);
+    }
+
+    #format .summary-row:nth-child(6) {
+      --rainbow: #00c7be;
+      --rainbow-text: #0f766e;
+      --rainbow-bg: rgba(0, 199, 190, 0.1);
+      --rainbow-glow: rgba(0, 199, 190, 0.22);
+    }
+
+    #format .summary-row:nth-child(7) {
+      --rainbow: #32ade6;
+      --rainbow-text: #0369a1;
+      --rainbow-bg: rgba(50, 173, 230, 0.1);
+      --rainbow-glow: rgba(50, 173, 230, 0.22);
+    }
+
+    #format .summary-row:nth-child(8) {
+      --rainbow: #007aff;
+      --rainbow-text: #005bb5;
+      --rainbow-bg: rgba(0, 122, 255, 0.09);
+      --rainbow-glow: rgba(0, 122, 255, 0.22);
+    }
+
+    #format .summary-row:nth-child(9) {
+      --rainbow: #5856d6;
+      --rainbow-text: #4338ca;
+      --rainbow-bg: rgba(88, 86, 214, 0.09);
+      --rainbow-glow: rgba(88, 86, 214, 0.22);
+    }
+
+    #format .summary-row:nth-child(10) {
+      --rainbow: #8e5cf7;
+      --rainbow-text: #6d28d9;
+      --rainbow-bg: rgba(142, 92, 247, 0.09);
+      --rainbow-glow: rgba(142, 92, 247, 0.22);
+    }
+
+    #format .summary-row:nth-child(11) {
+      --rainbow: #af52de;
+      --rainbow-text: #86198f;
+      --rainbow-bg: rgba(175, 82, 222, 0.09);
+      --rainbow-glow: rgba(175, 82, 222, 0.22);
+    }
+
+    #format .summary-row:nth-child(12) {
+      --rainbow: #ff2d55;
+      --rainbow-text: #be123c;
+      --rainbow-bg: rgba(255, 45, 85, 0.08);
+      --rainbow-glow: rgba(255, 45, 85, 0.2);
+    }
+
+    #format .summary-row:nth-child(13) {
+      --rainbow: #ff375f;
+      --rainbow-text: #9f1239;
+      --rainbow-bg: rgba(255, 55, 95, 0.08);
+      --rainbow-glow: rgba(255, 55, 95, 0.2);
+    }
+
+    .prompt-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 18px 0 0;
+      padding: 12px;
+      border: 1px solid #2f3948;
+      border-bottom: 0;
+      border-radius: 8px 8px 0 0;
+      color: #dbe4ef;
+      background: #151b24;
+    }
+
+    .prompt-toolbar span {
+      color: #9fb0c3;
+      font-size: 13px;
+    }
+
+    .copy-button {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid rgba(0, 113, 227, 0.28);
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--accent);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    pre {
+      margin: 0;
+      max-height: 720px;
+      overflow: auto;
+      padding: 20px;
+      border: 1px solid #2f3948;
+      border-radius: 0 0 8px 8px;
+      color: #dbe4ef;
+      background: #1c1c1e;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.62;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .footer {
+      color: #718096;
+      font-size: 13px;
+      text-align: center;
+      padding: 28px 0 42px;
+    }
+
+    @media (max-width: 900px) {
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .rail {
+        position: static;
+      }
+
+      .hero::after {
+        width: 280px;
+        opacity: 0.34;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .status {
+        white-space: normal;
+      }
+
+      .hero {
+        padding: 38px 0 46px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+        margin-top: -20px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .steps li,
+      .summary-row {
+        gap: 10px;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell topbar">
+      <div class="brand">
+        <div class="mark">13</div>
+        <div>
+          <strong>Paper Reading Framework</strong>
+          <span>13-question insight prompt</span>
+        </div>
+      </div>
+      <div class="status"><span class="pulse"></span> Local static preview ready</div>
+    </div>
+
+    <section class="hero">
+      <div class="shell hero-content">
+        <div class="eyebrow">Research Ops Prompt</div>
+        <h1>
+          <span class="title-line">논문을 깊고 빠르게 읽는</span>
+          <span class="title-line accent">13가지 질문</span>
+        </h1>
+        <p>
+          <span class="title-line">AI+Robotics 논문을 배경, 방법, 검증, 한계, 공개 자원까지</span>
+          <span class="title-line">구조적으로 읽고 비교하기 위한 프롬프트입니다.</span>
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#copy-prompt">프롬프트 복사 영역</a>
+          <a class="button secondary" href="#format">13개 항목 보기</a>
+          <button class="button demo" type="button" data-example-toggle aria-expanded="false" aria-controls="orb-slam-example">ORB-SLAM 예시 보기</button>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <section class="shell metrics" aria-label="Prompt metrics">
+    <div class="metric"><span>Output</span><strong>Self-contained HTML</strong></div>
+    <div class="metric"><span>Summary Items</span><strong>13 fixed rows</strong></div>
+    <div class="metric"><span>Layout</span><strong>Single column</strong></div>
+    <div class="metric"><span>Source Policy</span><strong>Primary sources</strong></div>
+  </section>
+
+  <section class="shell example-wrap is-hidden" id="orb-slam-example">
+    <article class="paper-card">
+      <div class="paper-top">
+        <div class="paper-number">01</div>
+        <div>
+          <h2>ORB-SLAM: a Versatile and Accurate Monocular SLAM System</h2>
+          <div class="paper-meta">
+            <span>IEEE Transactions on Robotics, 2015</span>
+            <span>Raul Mur-Artal, J. M. M. Montiel, Juan D. Tardos</span>
+            <span>arXiv:1502.00956</span>
+          </div>
+        </div>
+      </div>
+      <div class="paper-body">
+        <p class="core-takeaway">한 줄 핵심: ORB-SLAM은 ORB feature 하나로 tracking, mapping, relocalization, loop closing을 통합하고 keyframe 생존/제거 전략과 Essential Graph를 결합해 단안 SLAM을 실시간·대규모·공개 코드 시스템으로 끌어올린 논문입니다.</p>
+        <div class="summary-list">
+          <div class="summary-row"><div class="row-index">01</div><div class="row-body"><div class="row-label">배경</div><div class="row-text">실시간 단안 Visual SLAM은 카메라 궤적과 sparse 3D map을 동시에 추정해야 하지만, bundle adjustment를 정확도와 계산량 사이에서 감당 가능하게 만드는 keyframe 기반 설계가 필요했습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">02</div><div class="row-body"><div class="row-label">문제</div><div class="row-text">논문은 하나의 카메라만으로 작은 실내부터 큰 실외 환경까지 tracking, mapping, relocalization, loop closing을 자동·실시간으로 수행하는 완성형 monocular SLAM 시스템을 목표로 합니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">03</div><div class="row-body"><div class="row-label">기존 한계</div><div class="row-text">PTAM은 정확한 keyframe 기반 BA를 보여줬지만 대규모 loop closing, 강한 relocalization, 자동 초기화, 장기 map 관리가 약했고 당시 일부 대안은 공개 구현이나 실시간 정확도 면에서 제한이 있었습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">04</div><div class="row-body"><div class="row-label">목표</div><div class="row-text">저자들은 다양한 카메라 움직임과 환경에서 동작하고, loop closure와 tracking failure recovery를 포함하며, 커뮤니티가 재현할 수 있도록 source code를 공개하는 단안 SLAM 시스템을 제시하려 했습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">05</div><div class="row-body"><div class="row-label">방법</div><div class="row-text">시스템은 ORB feature를 tracking, local mapping, relocalization, loop closing에 공통으로 쓰고, covisibility graph와 Essential Graph 위에서 g2o 기반 local BA 및 Sim(3) pose graph optimization을 수행합니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">06</div><div class="row-body"><div class="row-label">핵심 아이디어</div><div class="row-text">핵심은 keyframe과 map point를 탐색 중에는 넉넉하게 만들고 이후 엄격하게 제거하는 “survival of the fittest” 전략으로, tracking robustness와 compact lifelong map을 동시에 노리는 것입니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">07</div><div class="row-body"><div class="row-label">검증</div><div class="row-text">논문은 NewCollege robot sequence, TUM RGB-D benchmark의 16개 hand-held indoor sequence, KITTI odometry의 10개 car outdoor sequence 등 총 27개 sequence에서 실시간 처리, 정확도, relocalization, loop closing을 평가했습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">08</div><div class="row-body"><div class="row-label">결과</div><div class="row-text">ORB-SLAM은 i7-4700MQ 환경에서 입력 frame rate로 처리되며, 논문 결론 기준 작은 실내 환경에서는 보통 1cm 이하, 큰 실외 환경에서는 scale alignment 후 수 m 수준의 정확도를 보였습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">09</div><div class="row-body"><div class="row-label">비교</div><div class="row-text">TUM RGB-D와 KITTI 평가에서 ORB-SLAM은 PTAM, LSD-SLAM, RGBD-SLAM과 비교해 open trajectory에서는 유사하거나 더 정확하고, 큰 loop·relocalization·대규모 sequence에서는 더 안정적인 경향을 보였습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">10</div><div class="row-body"><div class="row-label">의의</div><div class="row-text">이 논문은 feature-based monocular SLAM을 실험실 데모가 아니라 공개 코드, 장기 map 관리, loop closing, relocalization을 갖춘 실용적 기준선으로 정착시켰다는 점에서 ORB-SLAM 계열의 출발점이 되었습니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">11</div><div class="row-body"><div class="row-label">한계</div><div class="row-text">단안 시스템이므로 metric scale은 본질적으로 관측되지 않고, 공식 README도 초기화 시 translation 부족, pure rotation, low texture, 크거나 느린 moving objects를 실패 가능 상황으로 명시합니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">12</div><div class="row-body"><div class="row-label">향후 과제</div><div class="row-text">논문은 tracking에 points at infinity를 포함해 회전 정보를 더 잘 활용하고, sparse map을 더 dense하고 유용한 reconstruction으로 확장하는 방향을 후속 과제로 제시합니다.</div></div></div>
+          <div class="summary-row"><div class="row-index">13</div><div class="row-body"><div class="row-label">자원 공개</div><div class="row-text">arXiv PDF와 IEEE DOI가 공개되어 있고, 저자 GitHub의 ORB_SLAM repository는 GPLv3 기반 source code, vocabulary, ROS 실행 예시와 example sequence 안내를 제공합니다.</div></div></div>
+        </div>
+        <div class="source-links" aria-label="ORB-SLAM sources">
+          <a href="https://arxiv.org/abs/1502.00956" target="_blank" rel="noreferrer">arXiv abstract</a>
+          <a href="https://arxiv.org/pdf/1502.00956" target="_blank" rel="noreferrer">PDF</a>
+          <a href="https://doi.org/10.1109/TRO.2015.2463671" target="_blank" rel="noreferrer">IEEE DOI</a>
+          <a href="https://github.com/raulmur/ORB_SLAM" target="_blank" rel="noreferrer">GitHub code</a>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <main class="shell">
+    <div class="grid">
+      <aside class="rail">
+        <h2>Navigation</h2>
+        <ul class="nav-list">
+          <li><a href="#usage"><span>사용 방법</span><b>01</b></a></li>
+          <li><a href="#principles"><span>확인 원칙</span><b>02</b></a></li>
+          <li><a href="#format"><span>13개 요약 항목</span><b>03</b></a></li>
+          <li><a href="#html-spec"><span>HTML 요구사항</span><b>04</b></a></li>
+          <li><a href="#copy-prompt"><span>복사용 전체 프롬프트</span><b>05</b></a></li>
+        </ul>
+      </aside>
+
+      <div>
+        <section class="panel" id="usage">
+          <div class="section-kicker">How To Use</div>
+          <h2>사용 방법</h2>
+          <ul class="steps">
+            <li><span class="badge">1</span><span>아래 “복사용 전체 프롬프트”를 그대로 복사해서 새 대화에 붙여넣습니다.</span></li>
+            <li><span class="badge">2</span><span><strong>[논문 리스트]</strong> 영역에 제목과 URL만 바꿔 넣습니다.</span></li>
+            <li><span class="badge">3</span><span>결과물은 <strong>paper_summaries_apple_style.html</strong> 파일로 요청하도록 되어 있습니다.</span></li>
+            <li><span class="badge">4</span><span>13개 항목은 2-column grid가 아니라 원컬럼으로 세로 누적되도록 명시되어 있습니다.</span></li>
+          </ul>
+        </section>
+
+        <section class="panel" id="principles">
+          <div class="section-kicker">Source Discipline</div>
+          <h2>소스 확인 원칙</h2>
+          <div class="summary-list">
+            <div class="summary-row"><div class="row-index">A</div><div class="row-body"><div class="row-label">1차 출처 우선</div><div class="row-text">논문 원문 abstract, PDF, project page, GitHub, dataset page, benchmark page를 가능한 한 확인합니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">B</div><div class="row-body"><div class="row-label">본문 최대 확인</div><div class="row-text">PDF 접근이 가능하면 초록만 보지 말고 본문, figure, table, appendix까지 최대한 읽고 요약 근거를 잡습니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">C</div><div class="row-body"><div class="row-label">근거 없는 추측 금지</div><div class="row-text">확인할 수 없는 내용은 “확인되지 않음”, “논문 내 명시 없음”, “공개 링크 확인 안 됨”처럼 표시합니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">D</div><div class="row-body"><div class="row-label">한계 구분</div><div class="row-text">논문이 직접 말한 한계와 논문 근거로 도출한 한계를 구분해서 씁니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">E</div><div class="row-body"><div class="row-label">자원 공개 검증</div><div class="row-text">코드, 데이터셋, 툴킷, checkpoint는 확인된 링크 기준으로 작성합니다.</div></div></div>
+          </div>
+        </section>
+
+        <section class="panel" id="format">
+          <div class="section-kicker">Fixed Format</div>
+          <h2>논문별 13개 항목 요약 형식</h2>
+          <div class="summary-list">
+            <div class="summary-row"><div class="row-index">01</div><div class="row-body"><div class="row-label">배경</div><div class="row-text">연구가 놓인 큰 분야, 임무 맥락과 중요성.</div></div></div>
+            <div class="summary-row"><div class="row-index">02</div><div class="row-body"><div class="row-label">문제</div><div class="row-text">논문이 풀려는 구체적 과제나 필요한 기능.</div></div></div>
+            <div class="summary-row"><div class="row-index">03</div><div class="row-body"><div class="row-label">기존 한계</div><div class="row-text">기존 방법, 도구, 가정이 부족한 지점.</div></div></div>
+            <div class="summary-row"><div class="row-index">04</div><div class="row-body"><div class="row-label">목표</div><div class="row-text">논문이 명시적으로 달성하려는 목표.</div></div></div>
+            <div class="summary-row"><div class="row-index">05</div><div class="row-body"><div class="row-label">방법</div><div class="row-text">제안 알고리즘, 시스템, 하드웨어, 모델, 절차.</div></div></div>
+            <div class="summary-row"><div class="row-index">06</div><div class="row-body"><div class="row-label">핵심 아이디어</div><div class="row-text">방법을 차별화하는 핵심 기술 메커니즘.</div></div></div>
+            <div class="summary-row"><div class="row-index">07</div><div class="row-body"><div class="row-label">검증</div><div class="row-text">데이터셋, 시뮬레이션, 필드 또는 하드웨어 실험, 검증 시나리오.</div></div></div>
+            <div class="summary-row"><div class="row-index">08</div><div class="row-body"><div class="row-label">결과</div><div class="row-text">성능, 정량 결과, 검증 성공 여부.</div></div></div>
+            <div class="summary-row"><div class="row-index">09</div><div class="row-body"><div class="row-label">비교</div><div class="row-text">기준 방법, 벤치마크, 기존 연구와의 비교.</div></div></div>
+            <div class="summary-row"><div class="row-index">10</div><div class="row-body"><div class="row-label">의의</div><div class="row-text">결과가 가능하게 하는 활용과 임무상 의미.</div></div></div>
+            <div class="summary-row"><div class="row-index">11</div><div class="row-body"><div class="row-label">한계</div><div class="row-text">남아 있는 제약, 실패 사례, 취약점.</div></div></div>
+            <div class="summary-row"><div class="row-index">12</div><div class="row-body"><div class="row-label">향후 과제</div><div class="row-text">다음 연구 단계나 후속 방향.</div></div></div>
+            <div class="summary-row"><div class="row-index">13</div><div class="row-body"><div class="row-label">자원 공개</div><div class="row-text">공개 코드, 데이터셋, 툴킷, 벤치마크.</div></div></div>
+          </div>
+        </section>
+
+        <section class="panel" id="html-spec">
+          <div class="section-kicker">HTML Spec</div>
+          <h2>출력 HTML 요구사항</h2>
+          <div class="summary-list">
+            <div class="summary-row"><div class="row-index">UI</div><div class="row-body"><div class="row-label">Apple-style 인터페이스</div><div class="row-text">밝은 배경, 큰 타이포그래피, 얇은 border, 부드러운 shadow, 절제된 카드 레이아웃을 사용합니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">NAV</div><div class="row-body"><div class="row-label">Anchor Navigation</div><div class="row-text">상단에는 논문별 anchor navigation 또는 chip-style 목차를 넣습니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">13</div><div class="row-body"><div class="row-label">원컬럼 고정</div><div class="row-text">13개 항목은 반드시 flex column으로 세로 누적하고, 2-column grid를 쓰지 않습니다.</div></div></div>
+            <div class="summary-row"><div class="row-index">SRC</div><div class="row-body"><div class="row-label">Source Chip</div><div class="row-text">paper, PDF, project, GitHub, dataset, checkpoint 링크는 확인된 경우만 카드 하단 chip으로 정리합니다.</div></div></div>
+          </div>
+        </section>
+
+        <section class="panel" id="copy-prompt">
+          <div class="section-kicker">Copy Block</div>
+          <h2>복사용 전체 프롬프트</h2>
+          <p>아래 블록 전체를 복사해서 새 대화에 붙여넣고, <strong>[논문 리스트]</strong> 영역만 교체하면 됩니다.</p>
+          <div class="prompt-toolbar">
+            <span>paper_summary_google_style_html_prompt.docx에서 추출한 원문</span>
+            <button class="copy-button" type="button" data-copy>Copy prompt</button>
+          </div>
+          <pre id="promptText">아래 논문 리스트를 바탕으로, 각 논문을 정확히 읽고 “논문별 13개 항목 요약”을 만든 뒤, 최종 결과를 Apple-style 느낌의 HTML 파일로 생성해줘.
+
+[논문 리스트]
+여기에 논문 제목과 URL을 붙여넣기.
+예:
+- Paper Title 1: https://...
+- Paper Title 2: https://...
+- Paper Title 3: https://...
+
+[역할과 관점]
+너는 SLAM, robot navigation, 3D perception, embodied AI, VLM/VLA, robot learning, human-robot interaction 분야를 잘 아는 연구자처럼 읽고 요약해야 해.
+단순 소개가 아니라, “왜 이 논문이 나왔는지, 무엇이 새롭고, 어떻게 검증했으며, 무엇이 아직 부족한지”가 드러나게 정리해.
+논문 간 공통점과 차이점이 자연스럽게 보이도록 각 논문의 핵심 아이디어를 구체적으로 써.
+
+[소스 확인 원칙]
+- 반드시 각 논문의 원문 abstract, PDF, project page, GitHub, dataset page, benchmark page를 가능한 한 확인해.
+- PDF나 공식 원문에 접근할 수 있으면 abstract만 보지 말고, 본문 전체를 최대한 읽고 figure, table, appendix까지 확인한 뒤 요약해.
+- arXiv, AAAI, IEEE, RA-L, conference proceeding, project page, GitHub, HuggingFace 등 공식 또는 1차 출처를 우선 사용해.
+- 최신 논문이거나 arXiv/AAAI/IEEE/RA-L 링크가 있으면 웹 검색을 사용해서 논문 원문과 공개 자원을 확인해.
+- 본문, appendix, project page, GitHub가 서로 다른 내용을 말하면 원문 논문과 공식 project page를 우선하되, 차이를 명시해.
+- 논문 내용에 근거하지 않은 추측은 하지 마.
+- 확인이 불가능한 내용은 “확인되지 않음”, “논문 내 명시 없음”, “공개 링크 확인 안 됨”처럼 정직하게 표시해.
+- 한계와 향후 과제는 논문이 명시한 것과 합리적으로 도출한 것을 구분해서 써.
+- “자원 공개”는 반드시 확인된 링크 기준으로 작성하고, 확인하지 못했으면 그렇게 밝혀.
+
+[논문별 요약 형식]
+각 논문은 정확히 아래 13개 항목으로 요약해.
+각 항목은 1문장으로 작성해.
+항목 순서는 절대 바꾸지 마.
+한국어로 작성하되, 기술 용어는 필요하면 영어를 병기해.
+문체는 자연스럽고 간결하게 써.
+각 문장은 논문의 핵심을 최대한 정보밀도 높게 담아.
+
+1. 배경
+- 연구가 놓인 큰 분야·임무 맥락과 중요성.
+
+2. 문제
+- 논문이 풀려는 구체적 과제나 필요한 기능.
+
+3. 기존 한계
+- 기존 방법·도구·가정이 부족한 지점.
+
+4. 목표
+- 논문이 명시적으로 달성하려는 목표.
+
+5. 방법
+- 제안 알고리즘·시스템·하드웨어·모델·절차.
+
+6. 핵심 아이디어
+- 방법을 차별화하는 핵심 기술 메커니즘.
+
+7. 검증
+- 데이터셋·시뮬레이션·필드/하드웨어 실험·검증 시나리오.
+
+8. 결과
+- 성능·정량 결과·검증 성공 여부.
+
+9. 비교
+- 기준 방법·벤치마크·기존 연구와의 비교.
+
+10. 의의
+- 결과가 가능하게 하는 활용·임무상 의미.
+
+11. 한계
+- 남아 있는 제약·실패 사례·취약점.
+
+12. 향후 과제
+- 다음 연구 단계나 후속 방향.
+
+13. 자원 공개
+- 공개 코드·데이터셋·툴킷·벤치마크.
+
+[내부 확인 체크리스트]
+각 논문에 대해 최종 요약 전에 내부적으로 다음을 확인해.
+- 이 논문이 기존 연구 흐름에서 어떤 빈칸을 메우는가?
+- 제안 방법의 입력, 출력, 학습 신호, inference 절차는 무엇인가?
+- 실험이 실제 로봇인지, 시뮬레이션인지, 오프라인 데이터셋 평가인지 구분했는가?
+- 정량 결과가 있다면 어떤 metric에서 얼마나 좋아졌는가?
+- baseline이 강한 편인지 약한 편인지 판단할 수 있는가?
+- failure case, limitation, deployment constraint가 무엇인가?
+- 공개 자원이 실제로 사용 가능한 상태인지 확인했는가?
+
+[내용 품질 요구사항]
+- 피상적인 설명을 피하고, 연구 맥락·기술적 차별점·검증 방식·정량 결과·비교·한계까지 비판적으로 요약해.
+- 핵심 키워드는 논문 맥락에 맞게 반영하되, SLAM, robot navigation, 3D perception, VLM/VLA, embodied AI, robot learning, human-robot interaction 등 AI+robotics 관점에서 중요한 축을 중심으로 해석해.
+- 방법 설명에는 가능하면 입력, 출력, 모델 구조, 학습 신호, inference 절차를 포함해.
+- 검증 설명에는 dataset, simulator, robot platform, environment, scenario를 가능한 한 구체적으로 포함해.
+- 결과 설명에는 metric 이름과 수치를 가능한 한 포함해.
+- 비교 설명에는 baseline 이름을 가능한 한 포함해.
+- 의의는 과장하지 말고, 이 결과가 navigation/HRI/robot learning 관점에서 무엇을 가능하게 하는지 써.
+- 한계는 논문이 말한 한계와 네가 논문 근거로 도출한 한계를 구분 가능하게 써.
+- 향후 과제는 단순히 “더 연구해야 한다”가 아니라, 데이터·모델·실험·배포 관점에서 구체적으로 써.
+
+[HTML 출력 요구사항]
+최종 결과는 하나의 완전한 HTML 파일로 만들어줘.
+HTML은 외부 CSS 파일 없이 self-contained 형태로 작성해.
+디자인은 Apple-style에 가깝게 밝고 절제된 톤으로 구성해.
+전체 배경은 #f5f5f7 계열의 밝은 gray를 사용하고, 카드는 white 또는 반투명 white 느낌으로 만들어.
+상단에는 제목, subtitle, 논문 개수, 생성 목적을 보여줘.
+상단에 논문별 anchor navigation 또는 chip-style 목차를 넣어줘.
+각 논문은 독립적인 큰 카드로 보여줘.
+
+각 논문 카드에는 다음 정보를 포함해:
+- 논문 번호
+- 제목
+- venue 또는 출처
+- URL
+- 한 줄 핵심 요약
+- 13개 항목 요약
+- source chip 또는 citation link
+
+[13개 항목 레이아웃 고정]
+13개 항목은 절대 2-column grid로 만들지 말고, 반드시 원컬럼으로 세로 방향에 하나씩 쌓아.
+각 항목은 한 줄 또는 한 블록 형태의 horizontal row/card로 보여줘.
+각 row는 왼쪽에 번호 badge, 가운데 또는 오른쪽에 항목명과 요약 문장이 오도록 해.
+01 → 13 순서가 시각적으로 명확해야 해.
+13개 항목 row는 무지개색 흐름으로 전개해.
+단, row 전체를 강한 원색으로 채우지 말고, Apple-style처럼 절제된 방식으로 번호 badge, 왼쪽 accent line, 아주 연한 background tint에만 색을 적용해.
+색 흐름은 red → orange → yellow → lime → green → teal → cyan → blue → indigo → violet → purple → pink → rose 순서처럼 자연스럽게 이어지게 해.
+항목명은 해당 row 색상의 어두운 계열로 표시하고, 본문 텍스트는 가독성을 위해 어두운 gray/black 계열을 유지해.
+항목명은 굵게 표시하고, 내용은 읽기 쉬운 본문 크기로 표시해.
+배경/문제/기존한계/목표/방법/핵심아이디어/검증/결과/비교/의의/한계/향후과제/자원공개가 눈에 잘 구분되게 해.
+hover effect, subtle shadow, rounded corner, spacing을 사용해.
+모바일에서도 읽기 좋게 responsive design을 적용해.
+표 형태보다는 카드/row 형태가 좋고, 가독성을 최우선으로 해.
+정량 결과가 있는 경우 숫자는 bold 처리해.
+코드/데이터 공개 여부는 자원 공개 항목과 카드 하단 source chip에서 다시 확인 가능하게 해.
+
+[레이아웃 구현 예시]
+13개 항목은 다음 구조를 반복해서 만들어:
+
+&lt;div class="summary-list"&gt;
+  &lt;div class="summary-row"&gt;
+    &lt;div class="row-index"&gt;01&lt;/div&gt;
+    &lt;div class="row-body"&gt;
+      &lt;div class="row-label"&gt;배경&lt;/div&gt;
+      &lt;div class="row-text"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="summary-row"&gt;
+    &lt;div class="row-index"&gt;02&lt;/div&gt;
+    &lt;div class="row-body"&gt;
+      &lt;div class="row-label"&gt;문제&lt;/div&gt;
+      &lt;div class="row-text"&gt;...&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+CSS에서는 반드시 다음 원칙을 지켜:
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.summary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+절대 .summary-list에 grid-template-columns: repeat(2, ...) 같은 2-column 구조를 쓰지 마.
+
+[시각 디자인 가이드]
+- 전체 디자인은 Apple-style에 가깝게 밝고 절제된 톤으로 구성해.
+- 배경은 #f5f5f7 계열의 밝은 gray를 사용하고, 카드는 white 또는 반투명 white 느낌으로 만들어.
+- rounded corner, 얇은 border, 부드러운 shadow, 넓은 여백을 사용해.
+- primary accent는 Apple blue 계열을 사용하되, 13개 요약 항목에는 rainbow accent를 적용해.
+- rainbow accent는 과하게 장식하지 말고 번호 badge, 왼쪽 line, 연한 row tint 정도로만 사용해.
+- 무지개색은 “정보 구조를 구분하는 색”이지 “장식 배경”이 아니게 해줘.
+- 본문 가독성을 최우선으로 하고, 긴 문장은 충분한 line-height를 둬.
+- 논문별 card는 충분한 margin과 padding을 둬.
+- source chip은 작은 pill 형태로 만들어.
+- 모바일 화면에서는 row가 자연스럽게 줄바꿈되도록 해.
+- 긴 URL은 줄바꿈되도록 word-break 처리를 해.
+
+[출처와 링크 처리]
+- 각 논문 카드 하단에 source chip을 넣어 paper, PDF, project, GitHub, dataset, checkpoint 링크를 정리해.
+- 확인한 링크만 넣고, 확인하지 못한 링크는 넣지 마.
+- 공개 예정이지만 아직 확인되지 않은 경우 source chip이 아니라 자원 공개 문장 안에서 “공개 예정으로 명시됨, 실제 링크는 확인되지 않음”이라고 써.
+- 각 논문 요약의 핵심 근거가 되는 링크는 카드 하단에서 접근 가능해야 해.
+
+[최종 응답 방식]
+- HTML 파일을 생성한 뒤 다운로드 링크를 제공해.
+- 파일명은 paper_summaries_apple_style.html로 해.
+- HTML 코드 전체를 채팅창에 길게 붙여넣지 말고, 파일로 제공해.
+- 파일을 만들 수 없는 환경이면, 완전한 HTML 코드를 하나의 code block으로 제공하되, 사용자가 그대로 저장하면 동작해야 해.
+
+[최종 품질 점검]
+최종 파일을 제공하기 전에 다음을 확인해:
+- 논문 개수가 입력 리스트와 일치하는가?
+- 각 논문마다 13개 항목이 모두 있는가?
+- 항목 순서가 01~13으로 고정되어 있는가?
+- 13개 항목이 2-column이 아니라 원컬럼 vertical layout인가?
+- 각 항목이 1문장 원칙을 지키는가?
+- 정량 결과, baseline, dataset, robot platform, 공개 자원 여부가 가능한 한 반영되었는가?
+- 불확실한 내용이 확정적인 표현으로 쓰이지 않았는가?
+- HTML이 self-contained이고 모바일 대응이 되는가?</pre>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer shell">Built from paper_summary_google_style_html_prompt.docx for local review.</footer>
+
+  <script>
+    const copyButton = document.querySelector("[data-copy]");
+    const promptText = document.querySelector("#promptText");
+    const exampleToggle = document.querySelector("[data-example-toggle]");
+    const examplePanel = document.querySelector("#orb-slam-example");
+
+    exampleToggle.addEventListener("click", () => {
+      const isHidden = examplePanel.classList.toggle("is-hidden");
+      exampleToggle.setAttribute("aria-expanded", String(!isHidden));
+      exampleToggle.textContent = isHidden ? "ORB-SLAM 예시 보기" : "ORB-SLAM 예시 닫기";
+      if (!isHidden) {
+        examplePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+
+    copyButton.addEventListener("click", async () => {
+      const text = promptText.innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyButton.textContent = "Copied";
+      } catch (error) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(promptText);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        copyButton.textContent = "Selected";
+      }
+      window.setTimeout(() => {
+        copyButton.textContent = "Copy prompt";
+      }, 1600);
+    });
+  </script>
+</body>
+</html>
