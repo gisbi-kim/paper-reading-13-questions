@@ -914,7 +914,7 @@
           <h2>복사용 전체 프롬프트</h2>
           <p>아래 블록 전체를 복사해서 새 대화에 붙여넣고, <strong>[논문 리스트]</strong> 영역만 교체하면 됩니다.</p>
           <div class="prompt-toolbar">
-            <span>paper_summary_google_style_html_prompt.docx에서 추출한 원문</span>
+            <span>13-question framework prompt</span>
             <button class="copy-button" type="button" data-copy>Copy prompt</button>
           </div>
           <pre id="promptText">아래 논문 리스트를 바탕으로, 각 논문을 정확히 읽고 “논문별 13개 항목 요약”을 만든 뒤, 최종 결과를 Apple-style 느낌의 HTML 파일로 생성해줘.
@@ -1171,7 +1171,7 @@ CSS에서는 반드시 다음 원칙을 지켜:
     </div>
   </main>
 
-  <footer class="footer shell">Built from paper_summary_google_style_html_prompt.docx for local review.</footer>
+  <footer class="footer shell">Paper Reading 13 Questions · Self-contained static prompt framework.</footer>
 
   <script>
     const copyButton = document.querySelector("[data-copy]");
@@ -1237,7 +1237,7 @@ CSS에서는 반드시 다음 원칙을 지켜:
       wipPrompt: getText("#wipPrompt"),
       copyTitle: getText("#copy-prompt h2"),
       copyDescription: getText("#copy-prompt p"),
-      copySource: "paper_summary_google_style_html_prompt.docx에서 정리한 최신 프롬프트",
+      copySource: "13-question framework prompt",
       footer: "Paper Reading 13 Questions · Self-contained static prompt framework.",
       orbTakeaway: getText(".core-takeaway"),
       orbRows: captureRows("#orb-slam-example .summary-row"),
@@ -1437,7 +1437,7 @@ For each item, provide the following 5 fields.
 - Concrete sentence-level or section-level edits to make now`,
       copyTitle: "Copy-Ready Prompt",
       copyDescription: "Copy the entire block below into a new conversation and replace only the [Paper List] section.",
-      copySource: "Latest prompt adapted from paper_summary_google_style_html_prompt.docx",
+      copySource: "Latest copy-ready framework prompt",
       footer: "Paper Reading 13 Questions · Self-contained static prompt framework.",
       orbTakeaway: "One-line takeaway: ORB-SLAM unified tracking, mapping, relocalization, and loop closing around ORB features, using keyframe survival/culling and the Essential Graph to turn monocular SLAM into a real-time, large-scale, open-source system.",
       orbRows: [
