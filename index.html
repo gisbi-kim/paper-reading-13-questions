@@ -86,6 +86,37 @@
       font-size: 12px;
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .lang-toggle {
+      min-height: 36px;
+      padding: 0 14px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.74);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .lang-toggle:hover {
+      transform: translateY(-1px);
+      border-color: rgba(0, 113, 227, 0.28);
+      background: #ffffff;
+    }
+
+    .lang-toggle strong {
+      color: var(--accent);
+    }
+
     .hero {
       position: relative;
       overflow: hidden;
@@ -732,6 +763,9 @@
           <span>13-question insight prompt</span>
         </div>
       </div>
+      <div class="topbar-actions">
+        <button class="lang-toggle" type="button" data-lang-toggle aria-label="Switch language">한 / EN</button>
+      </div>
     </div>
 
     <section class="hero">
@@ -1085,33 +1119,316 @@ CSS에서는 반드시 다음 원칙을 지켜:
     const promptText = document.querySelector("#promptText");
     const exampleToggle = document.querySelector("[data-example-toggle]");
     const examplePanel = document.querySelector("#orb-slam-example");
+    const langToggle = document.querySelector("[data-lang-toggle]");
+    const promptKo = promptText.textContent;
+
+    function getText(selector) {
+      const node = document.querySelector(selector);
+      return node ? node.textContent : "";
+    }
+
+    function captureRows(selector) {
+      return Array.from(document.querySelectorAll(selector)).map((row) => {
+        const label = row.querySelector(".row-label");
+        const text = row.querySelector(".row-text");
+        return [label ? label.textContent : "", text ? text.textContent : ""];
+      });
+    }
+
+    function setText(selector, value) {
+      const node = document.querySelector(selector);
+      if (node) node.textContent = value;
+    }
+
+    function setRows(selector, rows) {
+      document.querySelectorAll(selector).forEach((row, index) => {
+        if (!rows[index]) return;
+        const label = row.querySelector(".row-label");
+        const text = row.querySelector(".row-text");
+        if (label) label.textContent = rows[index][0];
+        if (text) text.textContent = rows[index][1];
+      });
+    }
+
+    const koContent = {
+      documentTitle: "논문을 깊고 빠르게 읽는 13가지 질문",
+      title: [getText("h1 .title-line:nth-child(1)"), getText("h1 .title-line:nth-child(2)")],
+      subtitle: [getText(".hero p .title-line:nth-child(1)"), getText(".hero p .title-line:nth-child(2)")],
+      buttons: {
+        copyArea: getText('.hero-actions a[href="#copy-prompt"]'),
+        format: getText('.hero-actions a[href="#format"]'),
+        openExample: "ORB-SLAM 예시 보기",
+        closeExample: "ORB-SLAM 예시 닫기",
+        copyPrompt: "프롬프트 복사",
+        copied: "복사됨",
+        selected: "선택됨"
+      },
+      nav: Array.from(document.querySelectorAll(".nav-list li span")).map((node) => node.textContent),
+      usageTitle: getText("#usage h2"),
+      usageSteps: Array.from(document.querySelectorAll("#usage .steps li span:last-child")).map((node) => node.textContent),
+      principlesTitle: getText("#principles h2"),
+      principles: captureRows("#principles .summary-row"),
+      formatTitle: getText("#format h2"),
+      formatRows: captureRows("#format .summary-row"),
+      specTitle: getText("#html-spec h2"),
+      specRows: captureRows("#html-spec .summary-row"),
+      copyTitle: getText("#copy-prompt h2"),
+      copyDescription: getText("#copy-prompt p"),
+      copySource: "paper_summary_google_style_html_prompt.docx에서 정리한 최신 프롬프트",
+      footer: "Paper Reading 13 Questions · Self-contained static prompt framework.",
+      orbTakeaway: getText(".core-takeaway"),
+      orbRows: captureRows("#orb-slam-example .summary-row"),
+      prompt: promptKo
+    };
+
+    const promptEn = `Using the paper list below, read each paper carefully and create a 13-question summary for every paper, then generate the final result as an Apple-style HTML file.
+
+[Paper List]
+Paste paper titles and URLs here.
+Example:
+- Paper Title 1: https://...
+- Paper Title 2: https://...
+- Paper Title 3: https://...
+
+[Role and Perspective]
+Read and summarize like a researcher familiar with SLAM, robot navigation, 3D perception, embodied AI, VLM/VLA, robot learning, and human-robot interaction.
+Do not write a shallow introduction; make clear why the paper exists, what is new, how it was validated, and what remains limited.
+Write each paper's central idea concretely so that similarities and differences across papers are easy to compare.
+
+[Source-Grounding Rules]
+- Check each paper's abstract, PDF, project page, GitHub, dataset page, and benchmark page whenever possible.
+- If the PDF or official full text is accessible, do not stop at the abstract; read as much of the full paper as possible, including figures, tables, and appendix.
+- Prefer official or primary sources such as arXiv, AAAI, IEEE, RA-L, conference proceedings, project pages, GitHub, and HuggingFace.
+- If the paper, appendix, project page, and GitHub disagree, prioritize the paper and official project page, but explicitly mention the discrepancy.
+- Do not speculate beyond the evidence in the paper.
+- Mark unverifiable claims honestly as "not confirmed", "not specified in the paper", or "public link not verified".
+- Separate limitations stated by the paper from limitations reasonably inferred from the paper.
+- For resources, use only verified links; if you cannot verify a link, say so.
+
+[13-Question Summary Format]
+Summarize each paper with exactly the following 13 items.
+Each item should be one sentence.
+Do not change the order.
+Write concisely, but keep high information density.
+
+1. Background
+2. Problem
+3. Prior Limitations
+4. Goal
+5. Method
+6. Core Idea
+7. Validation
+8. Results
+9. Comparison
+10. Significance
+11. Limitations
+12. Future Work
+13. Resources
+
+[Content Quality Requirements]
+- Avoid superficial descriptions and critically summarize research context, technical distinction, validation, quantitative results, comparison, and limitations.
+- Reflect paper-specific keywords in context, especially around SLAM, robot navigation, 3D perception, VLM/VLA, embodied AI, robot learning, and human-robot interaction.
+- When possible, include input, output, model structure, learning signal, and inference procedure in the method.
+- Include dataset, simulator, robot platform, environment, and scenario details in validation.
+- Include metric names and numbers whenever available.
+- Include baseline names whenever possible.
+- Do not exaggerate significance; explain what the result enables from a navigation, HRI, or robot-learning perspective.
+- Make future work concrete in terms of data, models, experiments, and deployment.
+
+[HTML Output Requirements]
+Create one complete self-contained HTML file.
+Show a title, subtitle, paper count, and generation purpose at the top.
+Include anchor navigation or chip-style paper navigation.
+Show each paper as an independent large card.
+Each card must include paper number, title, venue/source, URL, one-line takeaway, 13-question summary, and source chips or citation links.
+
+[13-Row Layout Rules]
+Never render the 13 items as a two-column grid; they must be stacked vertically in one column.
+Render each item as a horizontal row/card.
+Each row should have a number badge on the left and the label plus summary sentence in the body.
+Render the 13 rows with a rainbow progression.
+Do not fill whole rows with strong primary colors; in an Apple-style restrained design, apply color only to the number badge, left accent line, and a very light row tint.
+Use a natural sequence such as red -> orange -> yellow -> lime -> green -> teal -> cyan -> blue -> indigo -> violet -> purple -> pink -> rose.
+Use a darker shade of each row color for the label, while keeping body text dark gray or black for readability.
+
+[Visual Design Guide]
+- Use a bright, restrained Apple-style visual language.
+- Use a light gray background around #f5f5f7 and white or translucent white cards.
+- Use rounded corners, thin borders, soft shadows, and generous spacing.
+- Use Apple blue as the primary accent, while applying rainbow accents to the 13 summary rows.
+- Treat rainbow color as information structure, not decoration.
+- Prioritize body readability with comfortable line-height.
+- Make the layout responsive for mobile.
+- Use word-break handling for long URLs.
+
+[Sources and Links]
+- Add source chips at the bottom of each paper card for verified paper, PDF, project, GitHub, dataset, and checkpoint links.
+- Include only links that you actually verified.
+- If a resource is announced but not yet verified, mention that in the resources sentence rather than adding a source chip.
+
+[Final Response]
+- Create the HTML file and provide a download link.
+- Name the file paper_summaries_apple_style.html.
+- Do not paste the full HTML code into the chat unless file creation is impossible.`;
+
+    const enContent = {
+      documentTitle: "13 Questions for Deep and Fast Paper Reading",
+      title: ["13 Questions for", "Deep and Fast Paper Reading"],
+      subtitle: [
+        "A structured prompt for reading and comparing AI+Robotics papers",
+        "from background and method to validation, limitations, and resources."
+      ],
+      buttons: {
+        copyArea: "Copy Prompt",
+        format: "View 13 Questions",
+        openExample: "View ORB-SLAM Example",
+        closeExample: "Close ORB-SLAM Example",
+        copyPrompt: "Copy prompt",
+        copied: "Copied",
+        selected: "Selected"
+      },
+      nav: ["How to Use", "Source Rules", "13 Questions", "HTML Spec", "Copy Prompt"],
+      usageTitle: "How to Use",
+      usageSteps: [
+        "Copy the full prompt below and paste it into a new conversation.",
+        "Replace only the [Paper List] section with titles and URLs.",
+        "Ask for the result as paper_summaries_apple_style.html.",
+        "The 13 items are explicitly constrained to a one-column vertical layout, not a two-column grid."
+      ],
+      principlesTitle: "Source-Grounding Rules",
+      principles: [
+        ["Primary sources first", "Check the paper abstract, PDF, project page, GitHub, dataset page, and benchmark page whenever possible."],
+        ["Read the full paper", "If the PDF is accessible, do not stop at the abstract; read the body, figures, tables, and appendix as much as possible."],
+        ["No unsupported speculation", "Mark unverifiable claims as not confirmed, not specified in the paper, or public link not verified."],
+        ["Separate limitations", "Distinguish limitations stated by the paper from limitations inferred from evidence."],
+        ["Verify resources", "Write code, dataset, toolkit, and checkpoint availability only from verified links."]
+      ],
+      formatTitle: "13-Question Paper Summary Format",
+      formatRows: [
+        ["Background", "The broader field, task context, and why the work matters."],
+        ["Problem", "The concrete task or capability the paper tries to solve."],
+        ["Prior Limitations", "Where previous methods, tools, or assumptions fall short."],
+        ["Goal", "The explicit goal the paper sets out to achieve."],
+        ["Method", "The proposed algorithm, system, hardware, model, or procedure."],
+        ["Core Idea", "The technical mechanism that differentiates the method."],
+        ["Validation", "Datasets, simulations, field or hardware experiments, and scenarios."],
+        ["Results", "Performance, quantitative results, and whether validation succeeded."],
+        ["Comparison", "Baselines, benchmarks, and comparison with prior work."],
+        ["Significance", "What the result enables in research or deployment."],
+        ["Limitations", "Remaining constraints, failure cases, and weaknesses."],
+        ["Future Work", "Next research steps or follow-up directions."],
+        ["Resources", "Public code, datasets, toolkits, and benchmarks."]
+      ],
+      specTitle: "HTML Output Requirements",
+      specRows: [
+        ["Apple-style interface", "Use a bright background, large typography, thin borders, soft shadows, and restrained card layouts."],
+        ["Anchor navigation", "Add paper-level anchor navigation or a chip-style table of contents at the top."],
+        ["One column fixed", "Stack all 13 items vertically with flex column; do not use a two-column grid."],
+        ["Source chips", "Show verified paper, PDF, project, GitHub, dataset, and checkpoint links as chips at the bottom of each card."]
+      ],
+      copyTitle: "Copy-Ready Prompt",
+      copyDescription: "Copy the entire block below into a new conversation and replace only the [Paper List] section.",
+      copySource: "Latest prompt adapted from paper_summary_google_style_html_prompt.docx",
+      footer: "Paper Reading 13 Questions · Self-contained static prompt framework.",
+      orbTakeaway: "One-line takeaway: ORB-SLAM unified tracking, mapping, relocalization, and loop closing around ORB features, using keyframe survival/culling and the Essential Graph to turn monocular SLAM into a real-time, large-scale, open-source system.",
+      orbRows: [
+        ["Background", "Real-time monocular Visual SLAM must estimate camera trajectory and a sparse 3D map at once, while making bundle adjustment computationally manageable through a keyframe-based design."],
+        ["Problem", "The paper targets a complete monocular SLAM system that can perform tracking, mapping, relocalization, and loop closing automatically and in real time from a single camera across small indoor and large outdoor environments."],
+        ["Prior Limitations", "PTAM showed accurate keyframe-based BA but lacked large-scale loop closing, strong relocalization, automatic initialization, and long-term map management, while other alternatives had limits in public implementation or real-time accuracy."],
+        ["Goal", "The authors aimed to present a monocular SLAM system that works across diverse camera motions and environments, includes loop closure and tracking-failure recovery, and releases source code for community reproduction."],
+        ["Method", "ORB-SLAM uses ORB features for tracking, local mapping, relocalization, and loop closing, and runs g2o-based local BA plus Sim(3) pose graph optimization over covisibility and Essential Graph structures."],
+        ["Core Idea", "The central idea is a survival-of-the-fittest policy that creates keyframes and map points generously during exploration and later culls them aggressively to balance tracking robustness with compact lifelong maps."],
+        ["Validation", "The paper evaluates on 27 sequences: the NewCollege robot sequence, 16 hand-held indoor TUM RGB-D sequences, and 10 car outdoor KITTI odometry sequences."],
+        ["Results", "ORB-SLAM runs at input frame rate on an i7-4700MQ setup and reports typical accuracy below 1 cm in small indoor settings and a few meters in large outdoor settings after scale alignment."],
+        ["Comparison", "Across TUM RGB-D and KITTI, ORB-SLAM is comparable or more accurate than PTAM, LSD-SLAM, and RGBD-SLAM on open trajectories, and more robust on large loops, relocalization, and large-scale sequences."],
+        ["Significance", "The work established feature-based monocular SLAM as a practical open-code baseline with long-term map management, loop closing, and relocalization, becoming the starting point for the ORB-SLAM family."],
+        ["Limitations", "Because it is monocular, metric scale is not inherently observable, and the official README notes failure risks under insufficient translation, pure rotation, low texture, and large or slow moving objects."],
+        ["Future Work", "The paper proposes adding points at infinity for better rotational information and extending the sparse map toward denser, more useful reconstruction."],
+        ["Resources", "The arXiv PDF and IEEE DOI are public, and the authors' ORB_SLAM GitHub repository provides GPLv3 source code, vocabulary, ROS examples, and example sequence instructions."]
+      ],
+      prompt: promptEn
+    };
+
+    let currentLang = localStorage.getItem("paper13-lang") || "ko";
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      const c = lang === "en" ? enContent : koContent;
+      const isExampleOpen = !examplePanel.classList.contains("is-hidden");
+
+      document.documentElement.lang = lang;
+      document.title = c.documentTitle;
+      localStorage.setItem("paper13-lang", lang);
+      langToggle.innerHTML = lang === "ko" ? "<strong>한</strong> / EN" : "KO / <strong>EN</strong>";
+      langToggle.setAttribute("aria-label", lang === "ko" ? "Switch language to English" : "언어를 한국어로 전환");
+
+      setText("h1 .title-line:nth-child(1)", c.title[0]);
+      setText("h1 .title-line:nth-child(2)", c.title[1]);
+      setText(".hero p .title-line:nth-child(1)", c.subtitle[0]);
+      setText(".hero p .title-line:nth-child(2)", c.subtitle[1]);
+      setText('.hero-actions a[href="#copy-prompt"]', c.buttons.copyArea);
+      setText('.hero-actions a[href="#format"]', c.buttons.format);
+      exampleToggle.textContent = isExampleOpen ? c.buttons.closeExample : c.buttons.openExample;
+
+      document.querySelectorAll(".nav-list li span").forEach((node, index) => {
+        if (c.nav[index]) node.textContent = c.nav[index];
+      });
+      setText("#usage h2", c.usageTitle);
+      document.querySelectorAll("#usage .steps li").forEach((item, index) => {
+        const target = item.querySelector("span:last-child");
+        if (target && c.usageSteps[index]) target.textContent = c.usageSteps[index];
+      });
+
+      setText("#principles h2", c.principlesTitle);
+      setRows("#principles .summary-row", c.principles);
+      setText("#format h2", c.formatTitle);
+      setRows("#format .summary-row", c.formatRows);
+      setText("#html-spec h2", c.specTitle);
+      setRows("#html-spec .summary-row", c.specRows);
+      setText("#copy-prompt h2", c.copyTitle);
+      setText("#copy-prompt p", c.copyDescription);
+      setText(".prompt-toolbar span", c.copySource);
+      copyButton.textContent = c.buttons.copyPrompt;
+      promptText.textContent = c.prompt;
+      setText(".core-takeaway", c.orbTakeaway);
+      setRows("#orb-slam-example .summary-row", c.orbRows);
+      setText(".footer", c.footer);
+    }
 
     exampleToggle.addEventListener("click", () => {
       const isHidden = examplePanel.classList.toggle("is-hidden");
       exampleToggle.setAttribute("aria-expanded", String(!isHidden));
-      exampleToggle.textContent = isHidden ? "ORB-SLAM 예시 보기" : "ORB-SLAM 예시 닫기";
+      const labels = currentLang === "en" ? enContent.buttons : koContent.buttons;
+      exampleToggle.textContent = isHidden ? labels.openExample : labels.closeExample;
       if (!isHidden) {
         examplePanel.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
 
+    langToggle.addEventListener("click", () => {
+      applyLanguage(currentLang === "ko" ? "en" : "ko");
+    });
+
     copyButton.addEventListener("click", async () => {
       const text = promptText.innerText;
+      const labels = currentLang === "en" ? enContent.buttons : koContent.buttons;
       try {
         await navigator.clipboard.writeText(text);
-        copyButton.textContent = "Copied";
+        copyButton.textContent = labels.copied;
       } catch (error) {
         const selection = window.getSelection();
         const range = document.createRange();
         range.selectNodeContents(promptText);
         selection.removeAllRanges();
         selection.addRange(range);
-        copyButton.textContent = "Selected";
+        copyButton.textContent = labels.selected;
       }
       window.setTimeout(() => {
-        copyButton.textContent = "Copy prompt";
+        copyButton.textContent = labels.copyPrompt;
       }, 1600);
     });
+
+    applyLanguage(currentLang);
   </script>
 </body>
 </html>
